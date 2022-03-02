@@ -1,6 +1,6 @@
 # dart-sass-gulp4-template
 
-src配下で作成したHTML/Sass/JSファイルが、htdocs配下にHTML/CSS/JSファイとして格納されます。
+src配下で作成したPug/Sass/JSファイルが、htdocs配下にHTML/CSS/JSの圧縮ファイルとして格納されます。
 
 ## 開発環境
 

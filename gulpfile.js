@@ -1,5 +1,6 @@
 const { src, dest, watch, series, parallel } = require('gulp');
 
+const pug = require('gulp-pug');
 const htmlmin = require('gulp-htmlmin');
 const sass = require('gulp-sass')(require('sass'));
 const sassGlob = require('gulp-sass-glob-use-forward');
@@ -11,7 +12,7 @@ const browserSync = require("browser-sync").create();
 // ファイルパス
 const filepath = { src: 'src/', dist: 'htdocs/' };
 const filesrc = {
-    html: `${filepath.src}**/*.html`,
+    html: `${filepath.src}pug/**/*.pug`,
     css: `${filepath.src}scss/**/*.scss`,
     js: `${filepath.src}js/*.js`
 };
@@ -19,6 +20,9 @@ const filesrc = {
 // HTML
 const html = () => {
     return src(filesrc.html)
+        .pipe(pug({
+            pretty: true
+        }))
         .pipe(htmlmin({
             collapseWhitespace: true,
             removeComments: true

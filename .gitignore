@@ -1,3 +1,6 @@
+# Project only
+htdocs/
+
 # Logs
 logs
 *.log
