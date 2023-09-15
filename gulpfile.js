@@ -7,6 +7,8 @@ const sassGlob = require('gulp-sass-glob-use-forward');
 const postcss = require('gulp-postcss');
 const babel = require('gulp-babel');
 const uglify = require('gulp-uglify');
+const imagemin = require('gulp-imagemin');
+const imageminPngquant = require('imagemin-pngquant');
 const browserSync = require("browser-sync").create();
 
 // ファイルパス
@@ -14,7 +16,8 @@ const filepath = { src: 'src/', dist: 'htdocs/' };
 const filesrc = {
     html: `${filepath.src}pug/**/*.pug`,
     css: `${filepath.src}scss/**/*.scss`,
-    js: `${filepath.src}js/*.js`
+    js: `${filepath.src}js/*.js`,
+    images: `${filepath.src}images/*`
 };
 
 // HTML
@@ -63,6 +66,26 @@ const js = () => {
         .pipe(dest(`${filepath.dist}asset/js/`));
 };
 
+// 画像圧縮
+const images = () => {
+    return src(filesrc.images)
+        .pipe(imagemin([
+            imagemin.gifsicle({ interlaced: true }),
+            imagemin.mozjpeg({ quality: 80, progressive: true }),
+            imageminPngquant({
+                quality: [.50, .60],
+                speed: 1,
+            }),
+            imagemin.svgo({
+                plugins: [
+                    { removeViewBox: true },
+                    { cleanupIDs: false }
+                ]
+            })
+        ]))
+        .pipe(dest(`${filepath.dist}asset/images/`));
+};
+
 // ブラウザ自動リロード
 const browserSyncFunc = (done) => {
     browserSync.init(browserSyncOption);
@@ -89,15 +112,17 @@ const watchFiles = () => {
     watch(filesrc.html, series(html, browserSyncReload))
     watch(filesrc.css, series(css, browserSyncReload))
     watch(filesrc.js, series(js, browserSyncReload))
+    watch(filesrc.images, series(images, browserSyncReload))
 };
 
 // タスク登録
 exports.html = html;
 exports.css = css;
 exports.js = js;
+exports.images = images;
 exports.browserSyncReload = browserSyncReload;
 exports.watchFiles = watchFiles;
 
 // タスク呼び出し
-exports.default = series(parallel(html, css, js), parallel(watchFiles, browserSyncFunc));
-exports.build = parallel(html, css, js);
+exports.default = series(parallel(html, css, js, images), parallel(watchFiles, browserSyncFunc));
+exports.build = parallel(html, css, js, images);
